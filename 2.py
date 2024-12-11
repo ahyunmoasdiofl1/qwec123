@@ -65,35 +65,29 @@ elif choice == "TIP DOWN":
             return "Run", "#00FF00"  # 초록
 
     # 테이블 렌더링
-    table_html = "<table style='border-collapse: collapse; width: 100%;'>"
+    edited_data = st.experimental_data_editor(data, use_container_width=True, height=400, key="data_editor")
+
+    # 상태 버튼과 원 렌더링
     for row_idx in range(len(data)):
-        table_html += "<tr>"
+        cols = st.columns(len(data.columns))
         for col_idx, col in enumerate(data.columns):
-            if row_idx == 0 or col_idx == 0:  # 첫 행과 첫 열은 수정 가능
-                cell_value = data.iloc[row_idx, col_idx]
-                editable = f"<input type='text' value='{cell_value}' style='width: 100%; border: 1px solid black;'>"
-                table_html += f"<td style='border: 1px solid black; text-align: center;'>{editable}</td>"
-            else:
+            if row_idx > 0 and col_idx > 0:  # 첫 행, 첫 열 제외
                 cell_key = f"cell_{row_idx}_{col_idx}"
                 current_state = st.session_state.cell_states.iloc[row_idx, col_idx]
                 next_state, color = get_next_state(current_state)
 
-                # 버튼과 원을 가로로 정렬
-                button_html = f"<button style='background-color:transparent; border:none; cursor:pointer;' onclick='window.location.reload();'>{current_state}</button>"
-                circle_html = f"<div style='margin-left: 5px; width: 20px; height: 20px; background-color:{color}; border-radius: 50%; display: inline-block;'></div>"
-                content_html = f"<div style='display: flex; align-items: center;'>{button_html}{circle_html}</div>"
-
-                table_html += f"<td style='border: 1px solid black; text-align: center;'>{content_html}</td>"
-        table_html += "</tr>"
-    table_html += "</table>"
-
-    st.markdown(table_html, unsafe_allow_html=True)
+                if cols[col_idx].button(" ", key=cell_key, help="Click to change state"):
+                    st.session_state.cell_states.iloc[row_idx, col_idx] = next_state
+                cols[col_idx].markdown(
+                    f"<div style='margin:auto; width:15px; height:15px; background-color:{color}; border-radius:50%;'></div>",
+                    unsafe_allow_html=True
+                )
 
     # 저장 및 불러오기 버튼을 한 줄에 배치
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Save Table"):
-            save_table_to_file(st.session_state.cell_states, FILE_NAME)
+            save_table_to_file(edited_data, FILE_NAME)
             st.success("Table has been saved successfully!")
     with col2:
         if st.button("Load Table"):
