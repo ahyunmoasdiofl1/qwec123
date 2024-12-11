@@ -53,7 +53,19 @@ elif choice == "TIP DOWN":
     try:
         with st.expander("Edit Table", expanded=True):
             data.reset_index(inplace=True)  # 첫 번째 열도 수정 가능하도록 인덱스를 열로 변환
-            data = st.data_editor(data, use_container_width=True, height=800, key="editable_table")
+
+            def run_tip_down(row, col):
+                st.write(f"Running Tip Down for cell ({row}, {col})")
+
+            for row in range(1, len(data)):
+                for col in range(1, len(data.columns)):
+                    button_label = f"Run ({row},{col})"
+                    button_key = f"button_{row}_{col}"
+
+                    if st.button(button_label, key=button_key):
+                        run_tip_down(row, col)
+
+            st.dataframe(data, use_container_width=True, height=800)
 
         # 저장 및 불러오기 버튼을 한 줄에 배치
         col1, col2 = st.columns(2)
@@ -67,10 +79,6 @@ elif choice == "TIP DOWN":
             if st.button("Load Table"):
                 data = load_table_from_file(FILE_NAME, create_default_table)
                 st.experimental_rerun()  # 새로고침
-
-        # 하단에 현재 데이터 표시
-        st.subheader("Current Table Data")
-        st.dataframe(data, use_container_width=True, height=800)
     except Exception as e:
         st.error(f"Error editing table: {e}")
 
