@@ -64,29 +64,27 @@ elif choice == "TIP DOWN":
             return "Run", "#00FF00"  # 초록
 
     # 테이블 렌더링
-    table_html = "<table style='border-collapse: collapse; width: 100%; border: 1px solid black;'>"
     for row_idx in range(len(data)):
-        table_html += "<tr>"
+        cols = st.columns(len(data.columns))
         for col_idx, col in enumerate(data.columns):
             if row_idx == 0 or col_idx == 0:  # 첫 행과 첫 열은 입력 필드로 수정 가능하게 설정
                 cell_value = data.iloc[row_idx, col_idx]
-                editable = f"<input type='text' value='{cell_value}' style='width: 100%; border: none; padding: 5px;'>"
-                table_html += f"<td style='border: 1px solid black; text-align: center;'>{editable}</td>"
+                updated_value = cols[col_idx].text_input(
+                    f"{row_idx},{col_idx}", value=cell_value, key=f"input_{row_idx}_{col_idx}"
+                )
+                data.iloc[row_idx, col_idx] = updated_value
             else:  # 나머지 셀은 버튼과 원 렌더링
                 cell_key = f"cell_{row_idx}_{col_idx}"
                 current_state = st.session_state.cell_states.iloc[row_idx, col_idx]
                 next_state, color = get_next_state(current_state)
 
-                # 버튼과 원을 렌더링
-                button_html = f"<button style='border: 1px solid black; padding: 5px; cursor: pointer;' onclick="window.location.reload();">{current_state}</button>"
-                circle_html = f"<div style='margin-left: 5px; width: 15px; height: 15px; background-color:{color}; border-radius:50%; display: inline-block;'></div>"
-                content_html = f"<div style='display: flex; align-items: center; justify-content: center;'>{circle_html}{button_html}</div>"
+                if cols[col_idx].button(f"Change {current_state}", key=f"button_{row_idx}_{col_idx}"):
+                    st.session_state.cell_states.iloc[row_idx, col_idx] = next_state
 
-                table_html += f"<td style='border: 1px solid black; text-align: center;'>{content_html}</td>"
-        table_html += "</tr>"
-    table_html += "</table>"
-
-    st.markdown(table_html, unsafe_allow_html=True)
+                cols[col_idx].markdown(
+                    f"<div style='margin:auto; width:15px; height:15px; background-color:{color}; border-radius:50%;'></div>",
+                    unsafe_allow_html=True
+                )
 
     # 저장 및 불러오기 버튼을 한 줄에 배치
     col1, col2 = st.columns(2)
