@@ -74,7 +74,7 @@ elif choice == "TIP DOWN":
                 )
                 data.iloc[row_idx, col_idx] = updated_value
             else:  # 나머지 셀은 버튼과 원 렌더링
-                cell_key = f"cell_{row_idx}_{col_idx}"
+
                 current_state = st.session_state.cell_states.iloc[row_idx, col_idx]
                 next_state, color = get_next_state(current_state)
 
