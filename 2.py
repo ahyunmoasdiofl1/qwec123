@@ -78,7 +78,7 @@ elif choice == "TIP DOWN":
                 current_state = st.session_state.cell_states.iloc[row_idx, col_idx]
                 next_state, color = get_next_state(current_state)
 
-                if cols[col_idx].button(f"Change {current_state}", key=f"button_{row_idx}_{col_idx}"):
+                if cols[col_idx].button(f" ", key=f"button_{row_idx}_{col_idx}"):
                     st.session_state.cell_states.iloc[row_idx, col_idx] = next_state
 
                 cols[col_idx].markdown(
