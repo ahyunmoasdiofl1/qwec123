@@ -77,11 +77,15 @@ elif choice == "TIP DOWN":
                 current_state = st.session_state.cell_states.iloc[row_idx, col_idx]
                 next_state, color = get_next_state(current_state)
 
-                button_html = f"<button onclick="" style='border: none; background: none; cursor: pointer; padding: 0; margin: 0;'>{current_state}</button>"
-                circle_html = f"<div style='margin-left: 5px; width: 15px; height: 15px; background-color:{color}; border-radius: 50%; display: inline-block;'></div>"
-                content_html = f"<div style='display: flex; justify-content: center; align-items: center;'>{button_html}{circle_html}</div>"
-
-                table_html += f"<td style='border: 1px solid black; text-align: center;'>{content_html}</td>"
+                # 버튼과 원을 Streamlit 위젯으로 렌더링
+                with st.container():
+                    col = st.columns(2)
+                    if col[0].button(current_state, key=f"button_{row_idx}_{col_idx}"):
+                        st.session_state.cell_states.iloc[row_idx, col_idx] = next_state
+                    col[1].markdown(
+                        f"<div style='margin:auto; width:15px; height:15px; background-color:{color}; border-radius:50%;'></div>",
+                        unsafe_allow_html=True
+                    )
         table_html += "</tr>"
     table_html += "</table>"
 
