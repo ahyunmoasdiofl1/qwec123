@@ -7,6 +7,7 @@ FILE_NAME = "table_data.csv"
 CAUSE_EFFECT_FILE = "cause_effect_data.csv"
 
 # 10x10 데이터프레임 생성 함수
+
 def create_default_table():
     return pd.DataFrame([[
         "Run" for _ in range(10)] for _ in range(10)],
@@ -74,14 +75,9 @@ elif choice == "TIP DOWN":
                 current_state = st.session_state.cell_states.iloc[row_idx, col_idx]
                 next_state, color = get_next_state(current_state)
 
-                button_html = f"""
-                <button style="background-color:{color}; color:black; border:none; padding:10px; width:100%; border-radius:5px; cursor:pointer;" onclick="window.location.reload();">
-                {current_state}
-                </button>
-                """
-                if cols[col_idx].button(f"", key=cell_key):
+                button_style = f"background-color:{color}; color:black; border:none; padding:10px; width:100%; border-radius:5px; cursor:pointer;"
+                if cols[col_idx].button(current_state, key=cell_key, help=f"Click to change state ({row_idx}, {col_idx})", args=(row_idx, col_idx)):
                     st.session_state.cell_states.iloc[row_idx, col_idx] = next_state
-                cols[col_idx].markdown(button_html, unsafe_allow_html=True)
 
     # 저장 및 불러오기 버튼을 한 줄에 배치
     col1, col2 = st.columns(2)
@@ -131,11 +127,3 @@ elif choice == "Upload Excel":
             # 업로드된 엑셀 파일 읽기
             excel_data = pd.read_excel(uploaded_file, engine='openpyxl')
             st.success("File uploaded successfully!")
-            
-            # 업로드된 데이터 표시
-            with st.expander("Uploaded Excel Data", expanded=True):
-                st.dataframe(excel_data, use_container_width=True, height=800)
-        except ImportError:
-            st.error("Missing dependency: openpyxl. Install it using 'pip install openpyxl'.")
-        except Exception as e:
-            st.error(f"Error loading file: {e}")
