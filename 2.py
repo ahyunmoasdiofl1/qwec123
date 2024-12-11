@@ -7,7 +7,6 @@ FILE_NAME = "table_data.csv"
 CAUSE_EFFECT_FILE = "cause_effect_data.csv"
 
 # 10x10 데이터프레임 생성 함수
-
 def create_default_table():
     return pd.DataFrame([[
         "Run" for _ in range(10)] for _ in range(10)],
@@ -65,18 +64,21 @@ elif choice == "TIP DOWN":
             return "Run", "#00FF00"  # 초록
 
     # 테이블 렌더링
-    edited_data = st.experimental_data_editor(data, use_container_width=True, height=400, key="data_editor")
-
-    # 상태 버튼과 원 렌더링
     for row_idx in range(len(data)):
         cols = st.columns(len(data.columns))
         for col_idx, col in enumerate(data.columns):
-            if row_idx > 0 and col_idx > 0:  # 첫 행, 첫 열 제외
+            if row_idx == 0 or col_idx == 0:  # 첫 행과 첫 열은 입력 필드로 수정 가능하게 설정
+                cell_value = data.iloc[row_idx, col_idx]
+                updated_value = cols[col_idx].text_input(
+                    f"{row_idx},{col_idx}", value=cell_value, key=f"input_{row_idx}_{col_idx}"
+                )
+                data.iloc[row_idx, col_idx] = updated_value
+            else:  # 나머지 셀은 버튼과 원 렌더링
                 cell_key = f"cell_{row_idx}_{col_idx}"
                 current_state = st.session_state.cell_states.iloc[row_idx, col_idx]
                 next_state, color = get_next_state(current_state)
 
-                if cols[col_idx].button(" ", key=cell_key, help="Click to change state"):
+                if cols[col_idx].button(" ", key=cell_key):
                     st.session_state.cell_states.iloc[row_idx, col_idx] = next_state
                 cols[col_idx].markdown(
                     f"<div style='margin:auto; width:15px; height:15px; background-color:{color}; border-radius:50%;'></div>",
@@ -87,7 +89,7 @@ elif choice == "TIP DOWN":
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Save Table"):
-            save_table_to_file(edited_data, FILE_NAME)
+            save_table_to_file(data, FILE_NAME)
             st.success("Table has been saved successfully!")
     with col2:
         if st.button("Load Table"):
