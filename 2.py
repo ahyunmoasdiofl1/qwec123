@@ -9,7 +9,7 @@ CAUSE_EFFECT_FILE = "cause_effect_data.csv"
 # 10x10 데이터프레임 생성 함수
 def create_default_table():
     return pd.DataFrame([[
-        "" for _ in range(10)] for _ in range(10)],
+        "Run" for _ in range(10)] for _ in range(10)],
         columns=[f"Col {i+1}" for i in range(10)]).astype(str)  # 모든 데이터를 문자열로 설정
 
 # 원인/대책 데이터프레임 생성 함수
@@ -49,38 +49,46 @@ elif choice == "TIP DOWN":
     # 데이터 불러오기 또는 기본 테이블 생성
     data = load_table_from_file(FILE_NAME, create_default_table)
 
-    # 첫 행과 첫 열도 수정 가능하도록 표시
-    try:
-        with st.expander("Edit Table", expanded=True):
-            data.reset_index(inplace=True)  # 첫 번째 열도 수정 가능하도록 인덱스를 열로 변환
+    # 셀 상태 관리 변수
+    if "cell_states" not in st.session_state:
+        st.session_state.cell_states = pd.DataFrame([[
+            "Run" for _ in range(10)] for _ in range(10)],
+            columns=[f"Col {i+1}" for i in range(10)]).astype(str)
 
-            def run_tip_down(row, col):
-                st.write(f"Running Tip Down for cell ({row}, {col})")
+    def get_next_state(current_state):
+        if current_state == "Run":
+            return "Tip", "#FFFF00"  # 노랑
+        elif current_state == "Tip":
+            return "Down", "#FF0000"  # 빨강
+        else:
+            return "Run", "#00FF00"  # 초록
 
-            for row in range(1, len(data)):
-                for col in range(1, len(data.columns)):
-                    button_label = f"Run ({row},{col})"
-                    button_key = f"button_{row}_{col}"
+    # 테이블 렌더링
+    for row_idx in range(len(data)):
+        cols = st.columns(len(data.columns))
+        for col_idx, col in enumerate(data.columns):
+            if row_idx == 0 or col_idx == 0:  # 첫 행과 첫 열은 표시만
+                cols[col_idx].write(data.iloc[row_idx, col_idx])
+            else:
+                cell_key = f"cell_{row_idx}_{col_idx}"
+                current_state = st.session_state.cell_states.iloc[row_idx, col_idx]
+                next_state, color = get_next_state(current_state)
 
-                    if st.button(button_label, key=button_key):
-                        run_tip_down(row, col)
+                if cols[col_idx].button(current_state, key=cell_key, help=f"Click to change state ({row_idx}, {col_idx})"):
+                    st.session_state.cell_states.iloc[row_idx, col_idx] = next_state
 
-            st.dataframe(data, use_container_width=True, height=800)
+                cols[col_idx].markdown(f"<div style='background-color:{color}; padding:10px; text-align:center;'>{current_state}</div>", unsafe_allow_html=True)
 
         # 저장 및 불러오기 버튼을 한 줄에 배치
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("Save Table"):
-                if "index" in data.columns:
-                    data.set_index("index", inplace=True)  # 인덱스를 다시 설정
-                save_table_to_file(data, FILE_NAME)
-                st.success("Table has been saved successfully!")
-        with col2:
-            if st.button("Load Table"):
-                data = load_table_from_file(FILE_NAME, create_default_table)
-                st.experimental_rerun()  # 새로고침
-    except Exception as e:
-        st.error(f"Error editing table: {e}")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Save Table"):
+            save_table_to_file(st.session_state.cell_states, FILE_NAME)
+            st.success("Table has been saved successfully!")
+    with col2:
+        if st.button("Load Table"):
+            st.session_state.cell_states = load_table_from_file(FILE_NAME, create_default_table)
+            st.experimental_rerun()  # 새로고침
 
 elif choice == "Cause & Effect":
     st.subheader("Cause & Effect")
