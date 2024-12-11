@@ -79,9 +79,9 @@ elif choice == "TIP DOWN":
                 next_state, color = get_next_state(current_state)
 
                 cols[col_idx].markdown(
-                    f"<div style='display: flex; align-items: center; justify-content: center;'>"
-                    f"<button style='margin-right: 5px; border: 1px solid black; padding: 5px 10px; cursor: pointer;'>{current_state}</button>"
-                    f"<div style='width: 20px; height: 20px; background-color: {color}; border-radius: 50%;'></div>"
+                    f"<div style='display: flex; align-items: center; justify-content: space-between;'>"
+                    f"<button style='border: 1px solid black; padding: 5px 10px; cursor: pointer;'>{current_state}</button>"
+                    f"<div style='width: 20px; height: 20px; background-color: {color}; border-radius: 50%; margin-left: 10px;'></div>"
                     f"</div>",
                     unsafe_allow_html=True
                 )
