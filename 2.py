@@ -75,11 +75,14 @@ elif choice == "TIP DOWN":
                 current_state = st.session_state.cell_states.iloc[row_idx, col_idx]
                 next_state, color = get_next_state(current_state)
 
-                if cols[col_idx].button(current_state, key=cell_key):
+                button_key = f"button_{row_idx}_{col_idx}"
+                if cols[col_idx].button(" ", key=button_key):
                     st.session_state.cell_states.iloc[row_idx, col_idx] = next_state
+
+                # 작은 원을 HTML로 생성하여 표시
                 cols[col_idx].markdown(
                     f"""
-                    <div style="background-color:{color}; color:black; border:none; padding:10px; text-align:center; border-radius:5px;">{current_state}</div>
+                    <div style="margin:auto; width:20px; height:20px; background-color:{color}; border-radius:50%;"></div>
                     """,
                     unsafe_allow_html=True
                 )
