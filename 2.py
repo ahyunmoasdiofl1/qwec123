@@ -80,8 +80,8 @@ elif choice == "TIP DOWN":
 
                 cols[col_idx].markdown(
                     f"<div style='display: flex; align-items: center; justify-content: center;'>"
-                    f"<button style='margin-right: 5px; border: 1px solid black; padding: 5px; cursor: pointer;' onclick='window.location.reload();'>{current_state}</button>"
-                    f"<div style='width: 15px; height: 15px; background-color: {color}; border-radius: 50%;'></div>"
+                    f"<button style='margin-right: 5px; border: 1px solid black; padding: 5px 10px; cursor: pointer;'>{current_state}</button>"
+                    f"<div style='width: 20px; height: 20px; background-color: {color}; border-radius: 50%;'></div>"
                     f"</div>",
                     unsafe_allow_html=True
                 )
