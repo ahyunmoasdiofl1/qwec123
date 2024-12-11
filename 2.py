@@ -37,17 +37,23 @@ st.markdown(
         z-index: 2; /* 출력창보다 위에 배치 */
     }}
     </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# 출력창 생성
+st.markdown(
+    f"""
     <div class="container">
         {output_text}
-        <form method="post">
-            <button class="hidden-button" name="hidden_button"></button>
-        </form>
+        <button class="hidden-button" onclick="window.location.href = window.location.href + '&hidden_button=true'"></button>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
 # 버튼 클릭 이벤트 처리
-if st.experimental_get_query_params().get("hidden_button"):
+query_params = st.experimental_get_query_params()
+if "hidden_button" in query_params:
     st.session_state["button_clicked"] = not st.session_state["button_clicked"]
-    st.experimental_set_query_params(hidden_button=None)  # 상태 초기화
+    st.experimental_set_query_params()  # 상태 초기화
