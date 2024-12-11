@@ -8,44 +8,47 @@ if "button_clicked" not in st.session_state:
 st.markdown(
     """
     <style>
-    .dynamic-button {
+    .hidden-button {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: transparent; /* 완전 투명 */
         border: none;
-        padding: 15px 30px;
-        font-size: 18px;
-        font-weight: bold;
-        border-radius: 10px;
         cursor: pointer;
+        z-index: 1; /* 출력창 위에 배치 */
+    }
+    .output-container {
+        position: relative;
+        width: 300px;
+        height: 100px;
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
         text-align: center;
-        color: white;
-        transition: background 0.3s;
-    }
-    .dynamic-button.default {
-        background-color: #4CAF50; /* 기본 상태: 초록색 */
-    }
-    .dynamic-button.clicked {
-        background-color: #FF5733; /* 클릭 상태: 주황색 */
+        z-index: 0; /* 출력창 아래 배치 */
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# 클릭 상태에 따른 텍스트와 클래스 설정
-if st.session_state["button_clicked"]:
-    button_text = "Clicked! 상태: ON"
-    button_class = "dynamic-button clicked"
-else:
-    button_text = "Click Me 상태: OFF"
-    button_class = "dynamic-button default"
+# 출력창 생성
+output_text = (
+    "현재 상태: ON" if st.session_state["button_clicked"] else "현재 상태: OFF"
+)
+st.markdown(
+    f"""
+    <div class="output-container">
+        <p>{output_text}</p>
+        <button class="hidden-button" onclick="document.querySelector('[data-testid^=stButton]').click();"></button>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
-# 버튼 HTML 생성
-button_html = f"""
-<button class="{button_class}" onclick="document.querySelector('[data-testid^=stButton]').click();">{button_text}</button>
-"""
-
-# 버튼 클릭 처리
-if st.button("Hidden Button", key="dynamic_button"):
+# 버튼 클릭 처리 (히든 버튼)
+if st.button("Hidden Button", key="hidden_button"):
     st.session_state["button_clicked"] = not st.session_state["button_clicked"]
-
-# 버튼 렌더링
-st.markdown(button_html, unsafe_allow_html=True)
