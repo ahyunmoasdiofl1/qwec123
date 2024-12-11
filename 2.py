@@ -4,51 +4,50 @@ import streamlit as st
 if "button_clicked" not in st.session_state:
     st.session_state["button_clicked"] = False  # 버튼 클릭 여부 저장
 
-# CSS 스타일 추가
+# 클릭 상태에 따라 출력될 텍스트 설정
+output_text = (
+    "현재 상태: ON" if st.session_state["button_clicked"] else "현재 상태: OFF"
+)
+
+# CSS로 출력창과 투명 버튼 겹치기
 st.markdown(
-    """
+    f"""
     <style>
-    .output-container {
+    .container {{
         position: relative;
         width: 300px;
         height: 100px;
         background-color: #f5f5f5;
         border: 1px solid #ddd;
         border-radius: 5px;
-        padding: 10px;
         text-align: center;
-        z-index: 0;
-    }
-    .hidden-button {
+        line-height: 100px; /* 텍스트 가운데 정렬 */
+        font-size: 18px;
+        z-index: 1;
+    }}
+    .hidden-button {{
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: transparent; /* 완전 투명 */
+        background-color: transparent;
         border: none;
         cursor: pointer;
-        z-index: 1;
-    }
+        z-index: 2; /* 출력창보다 위에 배치 */
+    }}
     </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# 출력창 생성
-output_text = (
-    "현재 상태: ON" if st.session_state["button_clicked"] else "현재 상태: OFF"
-)
-st.markdown(
-    f"""
-    <div class="output-container">
-        <p>{output_text}</p>
-        <button class="hidden-button" onclick="document.querySelector('[data-testid^=stButton]').click();"></button>
+    <div class="container">
+        {output_text}
+        <form method="post">
+            <button class="hidden-button" name="hidden_button"></button>
+        </form>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-# 히든 버튼 클릭 처리
-if st.button("Hidden Button", key="hidden_button", help="You won't see me!"):
+# 버튼 클릭 이벤트 처리
+if st.experimental_get_query_params().get("hidden_button"):
     st.session_state["button_clicked"] = not st.session_state["button_clicked"]
+    st.experimental_set_query_params(hidden_button=None)  # 상태 초기화
