@@ -8,17 +8,6 @@ if "button_clicked" not in st.session_state:
 st.markdown(
     """
     <style>
-    .hidden-button {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: transparent; /* 완전 투명 */
-        border: none;
-        cursor: pointer;
-        z-index: 1; /* 출력창 위에 배치 */
-    }
     .output-container {
         position: relative;
         width: 300px;
@@ -28,7 +17,18 @@ st.markdown(
         border-radius: 5px;
         padding: 10px;
         text-align: center;
-        z-index: 0; /* 출력창 아래 배치 */
+        z-index: 0;
+    }
+    .hidden-button {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: transparent; /* 완전 투명 */
+        border: none;
+        cursor: pointer;
+        z-index: 1;
     }
     </style>
     """,
@@ -49,6 +49,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# 버튼 클릭 처리 (히든 버튼)
-if st.button("Hidden Button", key="hidden_button"):
+# 히든 버튼 클릭 처리
+if st.button("Hidden Button", key="hidden_button", help="You won't see me!"):
     st.session_state["button_clicked"] = not st.session_state["button_clicked"]
