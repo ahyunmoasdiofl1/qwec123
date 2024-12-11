@@ -67,9 +67,6 @@ elif choice == "TIP DOWN":
             data = load_table_from_file(FILE_NAME, create_default_table)
             st.experimental_rerun()  # 새로고침
 
-        # 하단에 현재 데이터 표시
-        st.subheader("Current Table Data")
-        st.dataframe(data, use_container_width=True, height=800)
     except Exception as e:
         st.error(f"Error editing table: {e}")
 
