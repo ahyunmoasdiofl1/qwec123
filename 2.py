@@ -55,18 +55,22 @@ elif choice == "TIP DOWN":
             data.reset_index(inplace=True)  # 첫 번째 열도 수정 가능하도록 인덱스를 열로 변환
             data = st.data_editor(data, use_container_width=True, height=800, key="editable_table")
 
-        # 저장 버튼
-        if st.button("Save Table"):
-            if "index" in data.columns:
-                data.set_index("index", inplace=True)  # 인덱스를 다시 설정
-            save_table_to_file(data, FILE_NAME)
-            st.success("Table has been saved successfully!")
+        # 저장 및 불러오기 버튼을 한 줄에 배치
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Save Table"):
+                if "index" in data.columns:
+                    data.set_index("index", inplace=True)  # 인덱스를 다시 설정
+                save_table_to_file(data, FILE_NAME)
+                st.success("Table has been saved successfully!")
+        with col2:
+            if st.button("Load Table"):
+                data = load_table_from_file(FILE_NAME, create_default_table)
+                st.experimental_rerun()  # 새로고침
 
-        # 불러오기 버튼
-        if st.button("Load Table"):
-            data = load_table_from_file(FILE_NAME, create_default_table)
-            st.experimental_rerun()  # 새로고침
-
+        # 하단에 현재 데이터 표시
+        st.subheader("Current Table Data")
+        st.dataframe(data, use_container_width=True, height=800)
     except Exception as e:
         st.error(f"Error editing table: {e}")
 
