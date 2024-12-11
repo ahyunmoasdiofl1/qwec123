@@ -4,37 +4,41 @@ import streamlit as st
 rows = ["WSKHZN1", "WSKHZN2", "WSKHZN3", "WILHZT1", "WILHZT2", "WILHZT3", "WILHZT4"]
 columns = ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7", "CH8"]
 
-# 초기 상태 (ON=Green, OFF=Red, Yellow=Pending)
+# 초기 상태 (0=Green, 1=Red, 2=Yellow)
 if "status" not in st.session_state:
-    st.session_state["status"] = [[0 for _ in columns] for _ in rows]  # 0: Green, 1: Red, 2: Yellow
+    st.session_state["status"] = [[0 for _ in columns] for _ in rows]  # 초기 상태
 
 # 색상 매핑
 color_map = {0: "#4CAF50", 1: "#FF0000", 2: "#FFD700"}  # Green, Red, Yellow
 
-# CSS 스타일 추가
+# 스타일 정의
 st.markdown(
     """
     <style>
+    .table {
+        display: grid;
+        grid-template-columns: 150px repeat(8, 100px);
+        gap: 2px;
+        border-collapse: collapse;
+    }
+    .header {
+        background-color: #f1f1f1;
+        text-align: center;
+        font-weight: bold;
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    .cell {
+        text-align: center;
+        border: 1px solid #ddd;
+        padding: 8px;
+        background-color: white;
+    }
     .circle {
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        display: inline-block;
         margin: auto;
-    }
-    .table-container {
-        display: grid;
-        grid-template-columns: repeat(9, 100px); /* 8 CHs + 1 Row Label */
-        gap: 5px;
-    }
-    .header, .cell {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 30px;
-        font-size: 14px;
-        border: 1px solid #ddd;
-        background-color: #f9f9f9;
     }
     </style>
     """,
@@ -42,20 +46,28 @@ st.markdown(
 )
 
 # 표 출력
-st.markdown('<div class="table-container">', unsafe_allow_html=True)
+st.markdown('<div class="table">', unsafe_allow_html=True)
 
 # 헤더 출력
-st.markdown('<div class="header"></div>', unsafe_allow_html=True)  # 빈 셀
+st.markdown('<div class="header">Name</div>', unsafe_allow_html=True)
 for col in columns:
     st.markdown(f'<div class="header">{col}</div>', unsafe_allow_html=True)
 
-# 데이터 행 출력
-for row_idx, row in enumerate(rows):
-    st.markdown(f'<div class="cell">{row}</div>', unsafe_allow_html=True)  # 행 이름
+# 데이터 출력
+for row_idx, row_name in enumerate(rows):
+    # 행 이름 출력
+    st.markdown(f'<div class="cell">{row_name}</div>', unsafe_allow_html=True)
     for col_idx in range(len(columns)):
-        color = color_map[st.session_state["status"][row_idx][col_idx]]
-        if st.button("", key=f"btn_{row_idx}_{col_idx}"):
-            st.session_state["status"][row_idx][col_idx] = (st.session_state["status"][row_idx][col_idx] + 1) % 3
-        st.markdown(f'<div class="cell"><div class="circle" style="background-color: {color};"></div></div>', unsafe_allow_html=True)
+        # 현재 상태 가져오기
+        status = st.session_state["status"][row_idx][col_idx]
+        color = color_map[status]
+        # 버튼 생성
+        if st.button(" ", key=f"btn_{row_idx}_{col_idx}"):
+            st.session_state["status"][row_idx][col_idx] = (status + 1) % 3
+        # 원 출력
+        st.markdown(
+            f'<div class="cell"><div class="circle" style="background-color: {color};"></div></div>',
+            unsafe_allow_html=True,
+        )
 
-st.markdown("</div>", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
