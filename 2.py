@@ -1,8 +1,8 @@
 import streamlit as st
 
 # 데이터 상태 정의
-rows = ["WSKHZN1", "WSKHZN2", "WSKHZN3", "WILHZT1", "WILHZT2", "WILHZT3", "WILHZT4"]
-columns = ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7", "CH8"]
+rows = [f"Row {i+1}" for i in range(8)]
+columns = [f"CH{i+1}" for i in range(9)]
 
 # 초기 상태 (0=Green, 1=Red, 2=Yellow)
 if "status" not in st.session_state:
@@ -17,7 +17,7 @@ st.markdown(
     <style>
     .table {
         display: grid;
-        grid-template-columns: 150px repeat(8, 100px);
+        grid-template-columns: 150px repeat(9, 100px);
         gap: 2px;
         border-collapse: collapse;
     }
