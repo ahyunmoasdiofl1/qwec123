@@ -76,7 +76,7 @@ elif choice == "TIP DOWN":
                 next_state, color = get_next_state(current_state)
 
                 button_style = f"background-color:{color}; color:black; border:none; padding:10px; width:100%; border-radius:5px; cursor:pointer;"
-                if cols[col_idx].button(current_state, key=cell_key, help=f"Click to change state ({row_idx}, {col_idx})", args=(row_idx, col_idx)):
+                if cols[col_idx].button(current_state, key=cell_key):
                     st.session_state.cell_states.iloc[row_idx, col_idx] = next_state
 
     # 저장 및 불러오기 버튼을 한 줄에 배치
@@ -127,3 +127,11 @@ elif choice == "Upload Excel":
             # 업로드된 엑셀 파일 읽기
             excel_data = pd.read_excel(uploaded_file, engine='openpyxl')
             st.success("File uploaded successfully!")
+
+            # 업로드된 데이터 표시
+            with st.expander("Uploaded Excel Data", expanded=True):
+                st.dataframe(excel_data, use_container_width=True, height=800)
+        except ImportError:
+            st.error("Missing dependency: openpyxl. Install it using 'pip install openpyxl'.")
+        except Exception as e:
+            st.error(f"Error loading file: {e}")
