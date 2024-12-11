@@ -74,10 +74,14 @@ elif choice == "TIP DOWN":
                 current_state = st.session_state.cell_states.iloc[row_idx, col_idx]
                 next_state, color = get_next_state(current_state)
 
-                if cols[col_idx].button(current_state, key=cell_key, help=f"Click to change state ({row_idx}, {col_idx})"):
+                button_html = f"""
+                <button style="background-color:{color}; color:black; border:none; padding:10px; width:100%; border-radius:5px; cursor:pointer;" onclick="window.location.reload();">
+                {current_state}
+                </button>
+                """
+                if cols[col_idx].button(f"", key=cell_key):
                     st.session_state.cell_states.iloc[row_idx, col_idx] = next_state
-
-                cols[col_idx].markdown(f"<button style='background-color:{color}; color:black; border:none; padding:10px; width:100%; border-radius:5px;'>{current_state}</button>", unsafe_allow_html=True)
+                cols[col_idx].markdown(button_html, unsafe_allow_html=True)
 
     # 저장 및 불러오기 버튼을 한 줄에 배치
     col1, col2 = st.columns(2)
